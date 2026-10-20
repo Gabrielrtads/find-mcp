@@ -1,0 +1,234 @@
+[
+  {
+    "id": "youtube-transcript",
+    "name": "YouTube Transcript",
+    "repo": "kimtaeyoon83/mcp-server-youtube-transcript",
+    "stars": "1.2k",
+    "category": "media",
+    "intents": ["youtube", "video", "transcricao", "legenda", "resumo de video", "audio", "transcript"],
+    "stack": [],
+    "command": "npx",
+    "args": ["-y", "@kimtaeyoon83/mcp-server-youtube-transcript"],
+    "env": {},
+    "description": "Extracts YouTube transcripts, subtitles, and captions directly for AI analysis without needing to download media files.",
+    "tools": ["get_youtube_transcript"]
+  },
+  {
+    "id": "postgres",
+    "name": "PostgreSQL",
+    "repo": "modelcontextprotocol/servers",
+    "stars": "15k+",
+    "category": "database",
+    "intents": ["postgres", "postgresql", "sql", "database", "queries", "tables", "pg"],
+    "stack": ["pg", "postgres", "prisma", "drizzle-orm"],
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://user:password@localhost:5432/dbname"],
+    "env": {},
+    "description": "Official connector for PostgreSQL databases. Enables schema inspection, SELECT queries, and secure table audits.",
+    "tools": ["query", "describe_table", "list_tables"]
+  },
+  {
+    "id": "sqlite",
+    "name": "SQLite",
+    "repo": "modelcontextprotocol/servers",
+    "stars": "15k+",
+    "category": "database",
+    "intents": ["sqlite", "local database", "fts5", "db file", "embedded db"],
+    "stack": ["better-sqlite3", "sqlite3"],
+    "command": "uvx",
+    "args": ["mcp-server-sqlite", "--db-path", "path/to/database.db"],
+    "env": {},
+    "description": "High-performance native connector for local SQLite databases. Supports full-text search and structured data inspection.",
+    "tools": ["read_query", "write_query", "list_tables", "describe_table"]
+  },
+  {
+    "id": "docker",
+    "name": "Docker",
+    "repo": "modelcontextprotocol/servers",
+    "stars": "15k+",
+    "category": "devops",
+    "intents": ["docker", "container", "compose", "containers", "docker-compose", "docker images"],
+    "stack": ["docker-compose.yml", "Dockerfile"],
+    "command": "uvx",
+    "args": ["mcp-server-docker"],
+    "env": {},
+    "description": "Full Docker daemon management: inspect containers, tail real-time logs, start/stop services, and monitor container health.",
+    "tools": ["list_containers", "inspect_container", "get_container_logs", "start_container", "stop_container"]
+  },
+  {
+    "id": "linear",
+    "name": "Linear",
+    "repo": "linear/mcp-server",
+    "stars": "3.5k",
+    "category": "tasks",
+    "intents": ["linear", "kanban", "tasks", "issues", "tickets", "cards", "projects", "sprint"],
+    "stack": [],
+    "command": "npx",
+    "args": ["-y", "mcp-remote", "https://mcp.linear.app/mcp"],
+    "env": {},
+    "description": "Official Linear integration: manage issues, create tickets, move cards on kanban boards, and sync team sprints.",
+    "tools": ["list_issues", "save_issue", "get_issue", "list_projects", "list_teams"]
+  },
+  {
+    "id": "clickup",
+    "name": "ClickUp",
+    "repo": "modelcontextprotocol/servers",
+    "stars": "1.8k",
+    "category": "tasks",
+    "intents": ["clickup", "kanban", "tasks", "task manager", "productivity"],
+    "stack": [],
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-clickup"],
+    "env": {
+      "CLICKUP_API_TOKEN": "pk_..."
+    },
+    "description": "Connector for ClickUp: create tasks, fetch to-do lists, update project statuses, and manage workspaces.",
+    "tools": ["create_task", "get_tasks", "update_task"]
+  },
+  {
+    "id": "stripe",
+    "name": "Stripe",
+    "repo": "stripe/agent-toolkit",
+    "stars": "4.2k",
+    "category": "finance",
+    "intents": ["stripe", "payment", "checkout", "billing", "credit card", "subscription", "invoices"],
+    "stack": ["stripe", "@stripe/stripe-js"],
+    "command": "npx",
+    "args": ["-y", "@stripe/mcp"],
+    "env": {
+      "STRIPE_SECRET_KEY": "sk_test_..."
+    },
+    "description": "Official Stripe agent toolkit: query customers, invoices, products, checkout sessions, and payment records.",
+    "tools": ["list_customers", "create_payment_link", "get_invoice", "list_products"]
+  },
+  {
+    "id": "spotify",
+    "name": "Spotify Player",
+    "repo": "varunneal/spotify-mcp",
+    "stars": "2.1k",
+    "category": "media",
+    "intents": ["spotify", "music", "playlist", "play music", "audio player", "player"],
+    "stack": [],
+    "command": "npx",
+    "args": ["-y", "spotify-mcp"],
+    "env": {
+      "SPOTIFY_CLIENT_ID": "...",
+      "SPOTIFY_CLIENT_SECRET": "..."
+    },
+    "description": "Controls Spotify playback: play, pause, search tracks, list playlists, and adjust volume straight from chat.",
+    "tools": ["play", "pause", "search_tracks", "get_current_playback", "get_user_playlists"]
+  },
+  {
+    "id": "playwright",
+    "name": "Playwright Browser Automation",
+    "repo": "modelcontextprotocol/servers",
+    "stars": "15k+",
+    "category": "browser",
+    "intents": ["browser", "web automation", "click", "scraping", "e2e testing", "screenshot", "form fill"],
+    "stack": ["@playwright/test", "playwright"],
+    "command": "npx",
+    "args": ["-y", "@playwright/mcp@latest"],
+    "env": {},
+    "description": "Complete headless Chromium web automation: click buttons, fill forms, capture screenshots, and inspect dynamic SPAs.",
+    "tools": ["browser_navigate", "browser_click", "browser_type", "browser_take_screenshot"]
+  },
+  {
+    "id": "github",
+    "name": "GitHub Repository Manager",
+    "repo": "modelcontextprotocol/servers",
+    "stars": "15k+",
+    "category": "devops",
+    "intents": ["github", "git", "repository", "pull request", "pr", "commit", "issues"],
+    "stack": [".git"],
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-github"],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_..."
+    },
+    "description": "Comprehensive GitHub repository management: create pull requests, read remote code, file issues, and commit changes.",
+    "tools": ["get_file_contents", "create_pull_request", "list_issues", "create_issue", "push_files"]
+  },
+  {
+    "id": "slack",
+    "name": "Slack",
+    "repo": "modelcontextprotocol/servers",
+    "stars": "15k+",
+    "category": "communication",
+    "intents": ["slack", "team chat", "messages", "notification", "communication", "channel"],
+    "stack": [],
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-slack"],
+    "env": {
+      "SLACK_BOT_TOKEN": "xoxb-...",
+      "SLACK_TEAM_ID": "T..."
+    },
+    "description": "Slack workspace communication: post announcements, read message history, and reply to threaded conversations.",
+    "tools": ["list_channels", "post_message", "reply_to_thread", "get_channel_history"]
+  },
+  {
+    "id": "figma",
+    "name": "Figma Developer",
+    "repo": "modelcontextprotocol/servers",
+    "stars": "5.6k",
+    "category": "design",
+    "intents": ["figma", "design", "layout", "screens", "ui", "ux", "visual components"],
+    "stack": ["tailwind", "lucide-react"],
+    "command": "npx",
+    "args": ["-y", "figma-developer-mcp", "--stdio"],
+    "env": {
+      "FIGMA_API_KEY": "figd_..."
+    },
+    "description": "Inspects Figma design nodes, components, color tokens, and layout styles to generate faithful React/HTML code.",
+    "tools": ["get_file", "get_node", "get_styles"]
+  },
+  {
+    "id": "supabase",
+    "name": "Supabase Official",
+    "repo": "supabase/mcp-server-supabase",
+    "stars": "4.8k",
+    "category": "database",
+    "intents": ["supabase", "postgres", "auth", "rls", "storage", "cloud database", "edge functions"],
+    "stack": ["@supabase/supabase-js", "@supabase/ssr"],
+    "command": "npx",
+    "args": ["-y", "@supabase/mcp-server-supabase"],
+    "env": {
+      "SUPABASE_ACCESS_TOKEN": "sbp_...",
+      "SUPABASE_PROJECT_REF": "..."
+    },
+    "description": "Official Supabase management: inspect schemas, audit RLS policies, execute SQL queries, and monitor database logs.",
+    "tools": ["list_tables", "execute_sql", "get_project_status"]
+  },
+  {
+    "id": "n8n",
+    "name": "N8N Workflow Manager",
+    "repo": "neterius/n8n-mcp",
+    "stars": "2.4k",
+    "category": "automation",
+    "intents": ["n8n", "automation", "workflows", "flows", "webhooks", "integrations"],
+    "stack": [],
+    "command": "npx",
+    "args": ["-y", "@neterius/n8n-mcp"],
+    "env": {
+      "N8N_API_KEY": "...",
+      "N8N_API_URL": "https://your-n8n.com"
+    },
+    "description": "Author, inspect, activate, deactivate, and test automated workflows on N8N directly from chat.",
+    "tools": ["n8n_list_workflows", "n8n_get_workflow", "n8n_activate_workflow", "n8n_test_workflow"]
+  },
+  {
+    "id": "openrouter-zero",
+    "name": "OpenRouter Zero (Fast Stdio)",
+    "repo": "Gabrielrtads/openrouter-zero-mcp",
+    "stars": "1.0k",
+    "category": "ai",
+    "intents": ["openrouter", "deepseek", "models", "inference", "llama", "llm", "balance", "credits"],
+    "stack": [],
+    "command": "npx",
+    "args": ["-y", "openrouter-zero-mcp"],
+    "env": {
+      "OPENROUTER_API_KEY": "sk-or-v1-..."
+    },
+    "description": "Ultra-lightweight zero-dependency Node.js server (<30ms startup) for multi-model inference (DeepSeek V3, Claude, Gemini, Llama) and balance checks.",
+    "tools": ["openrouter_chat_completion", "openrouter_get_credits", "openrouter_list_models", "openrouter_manage_keys"]
+  }
+]

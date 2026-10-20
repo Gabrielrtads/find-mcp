@@ -1,0 +1,37 @@
+{
+  "name": "find-mcp",
+  "version": "1.0.0",
+  "description": "Smart, context-aware MCP server finder & configurator for Claude Desktop, Cursor, and AI agents. Curated from awesome-mcp-servers and Glama.",
+  "type": "module",
+  "bin": {
+    "find-mcp": "./scripts/search_mcp.mjs"
+  },
+  "scripts": {
+    "start": "node ./scripts/search_mcp.mjs",
+    "test": "node ./scripts/search_mcp.mjs youtube"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "find-mcp",
+    "mcp-finder",
+    "awesome-mcp-servers",
+    "claude",
+    "cursor",
+    "smithery",
+    "glama"
+  ],
+  "author": "Gabriel Toledo (@Gabrielrtads)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gabrielrtads/find-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Gabrielrtads/find-mcp/issues"
+  },
+  "homepage": "https://github.com/Gabrielrtads/find-mcp#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
