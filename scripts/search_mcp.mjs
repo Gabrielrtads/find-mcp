@@ -19,7 +19,7 @@ const defaultConfigPath = path.join(
 
 function loadCatalog() {
   if (!fs.existsSync(catalogPath)) {
-    throw new Error(`Catalog not found at: ${catalogPath}`);
+    throw new Error(`Catálogo não encontrado em: ${catalogPath}`);
   }
   return JSON.parse(fs.readFileSync(catalogPath, "utf-8"));
 }
@@ -76,19 +76,21 @@ export function searchMCP(options = {}) {
   const catalog = loadCatalog();
   const { installed, disabled } = loadInstalledServers();
   const query = (options.query || "").toLowerCase().trim();
+  const queryWords = query.split(/\s+/).filter(Boolean);
   const isContextMode = Boolean(options.context);
   const detectedStack = detectLocalStack(options.cwd || process.cwd());
 
   let scored = catalog.map((item) => {
-    let score = 0;
+    let queryScore = 0;
+    let contextScore = 0;
     const matchReasons = [];
 
     // 1. Context matching (stack tags)
     if (item.stack && item.stack.length > 0) {
       for (const st of item.stack) {
         if (detectedStack.has(st.toLowerCase())) {
-          score += 40;
-          matchReasons.push(`Detected '${st}' in active project`);
+          contextScore += 40;
+          matchReasons.push(`Detectado '${st}' no projeto atual`);
         }
       }
     }
@@ -96,31 +98,68 @@ export function searchMCP(options = {}) {
     // 2. Query text matching
     if (query) {
       if (item.id.toLowerCase() === query) {
-        score += 100;
-        matchReasons.push(`Exact ID match: ${item.id}`);
+        queryScore += 100;
+        matchReasons.push(`Correspondência exata de ID: ${item.id}`);
       } else if (item.name.toLowerCase().includes(query)) {
-        score += 60;
-        matchReasons.push(`Name matches: ${item.name}`);
+        queryScore += 60;
+        matchReasons.push(`Nome corresponde: ${item.name}`);
       }
 
-      // Check intents keywords
+      // Check intents keywords with robust boundary & stem matching
       for (const intent of item.intents || []) {
-        if (query.includes(intent.toLowerCase()) || intent.toLowerCase().includes(query)) {
-          score += 35;
-          matchReasons.push(`Intent match: '${intent}'`);
+        const intentLower = intent.toLowerCase();
+        let matches = false;
+
+        if (intentLower.includes(" ")) {
+          if (query.includes(intentLower)) {
+            matches = true;
+          }
+        } else if (intentLower.length <= 3) {
+          if (queryWords.includes(intentLower)) {
+            matches = true;
+          }
+        } else {
+          if (query.includes(intentLower)) {
+            matches = true;
+          } else {
+            for (const qw of queryWords) {
+              if (qw.length >= 4 && (qw.startsWith(intentLower) || intentLower.startsWith(qw))) {
+                matches = true;
+                break;
+              }
+            }
+          }
+        }
+
+        if (matches) {
+          queryScore += 35;
+          matchReasons.push(`Intenção mapeada: '${intent}'`);
         }
       }
 
       // Check description & tools
       if (item.description && item.description.toLowerCase().includes(query)) {
-        score += 20;
+        queryScore += 20;
       }
       for (const tool of item.tools || []) {
-        if (tool.toLowerCase().includes(query)) {
-          score += 30;
-          matchReasons.push(`Exposed tool: '${tool}'`);
+        const toolLower = tool.toLowerCase();
+        if (query.includes(toolLower) || queryWords.some((qw) => qw.length >= 4 && toolLower.includes(qw))) {
+          queryScore += 30;
+          matchReasons.push(`Ferramenta correspondente: '${tool}'`);
         }
       }
+    }
+
+    let finalScore = 0;
+    if (query) {
+      // If query was typed, require at least one query match before considering stack bonus
+      if (queryScore > 0) {
+        finalScore = queryScore + (contextScore > 0 ? 25 : 0);
+      } else if (isContextMode) {
+        finalScore = contextScore;
+      }
+    } else if (isContextMode) {
+      finalScore = contextScore;
     }
 
     // Status in local config
@@ -129,7 +168,7 @@ export function searchMCP(options = {}) {
 
     return {
       ...item,
-      score,
+      score: finalScore,
       matchReasons,
       isInstalled,
       isDisabled,
@@ -137,12 +176,7 @@ export function searchMCP(options = {}) {
   });
 
   // Filter and sort
-  if (query) {
-    scored = scored.filter((item) => item.score > 0);
-  } else if (isContextMode) {
-    scored = scored.filter((item) => item.score >= 40);
-  }
-
+  scored = scored.filter((item) => item.score > 0);
   scored.sort((a, b) => b.score - a.score);
 
   return scored.slice(0, options.limit || 3);
@@ -165,16 +199,17 @@ export function formatMCPConfigSnippet(mcp) {
 // CLI Execution
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
   const args = process.argv.slice(2);
-  let query = "";
+  const queryParts = [];
   let isContext = false;
   let isJson = false;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--context") isContext = true;
     else if (args[i] === "--json") isJson = true;
-    else if (!query) query = args[i];
+    else queryParts.push(args[i]);
   }
 
+  const query = queryParts.join(" ").trim();
   const results = searchMCP({ query, context: isContext });
 
   if (isJson) {
@@ -183,28 +218,28 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToP
   }
 
   if (results.length === 0) {
-    console.log(`\n❌ No MCP servers found matching '${query}'. Try searching awesome-mcp-servers.`);
+    console.log(`\n❌ Nenhum MCP encontrado para '${query}'. Tente outro termo ou consulte o awesome-mcp-servers.`);
     process.exit(0);
   }
 
-  console.log(`\n🔍 --- Recommended MCP Servers (Found: ${results.length}) ---\n`);
+  console.log(`\n🔍 --- MCPs Recomendados (Encontrados: ${results.length}) ---\n`);
 
   for (const item of results) {
     const statusBadge = item.isInstalled
       ? item.isDisabled
-        ? "🟡 [INSTALLED BUT DISABLED]"
-        : "🟢 [ALREADY INSTALLED]"
-      : "⚪ [NOT INSTALLED]";
+        ? "🟡 [INSTALADO MAS DESATIVADO]"
+        : "🟢 [JÁ INSTALADO]"
+      : "⚪ [NÃO INSTALADO]";
 
     console.log(`### 📦 ${item.name} (\`${item.id}\`) ${statusBadge}`);
-    console.log(`⭐ **Stars:** ${item.stars} | **Repo:** \`${item.repo}\``);
-    console.log(`📝 **Description:** ${item.description}`);
-    console.log(`🛠️ **Tools:** ${item.tools.map((t) => `\`${t}\``).join(", ")}`);
+    console.log(`⭐ **Estrelas:** ${item.stars} | **Repo:** \`${item.repo}\``);
+    console.log(`📝 **Descrição:** ${item.description}`);
+    console.log(`🛠️ **Ferramentas:** ${item.tools.map((t) => `\`${t}\``).join(", ")}`);
     if (item.matchReasons.length > 0) {
-      console.log(`💡 **Why it matches:** ${item.matchReasons.join("; ")}`);
+      console.log(`💡 **Por que faz sentido:** ${item.matchReasons.join("; ")}`);
     }
 
-    console.log("\n📋 **Snippet for `mcp_config.json`:**");
+    console.log("\n📋 **Snippet para colar no `mcp_config.json`:**");
     console.log("```json");
     console.log(formatMCPConfigSnippet(item));
     console.log("```\n------------------------------------------------------------\n");
