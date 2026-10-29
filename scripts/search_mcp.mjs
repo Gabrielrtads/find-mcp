@@ -186,7 +186,7 @@ export function formatMCPConfigSnippet(mcp) {
   const config = {
     command: mcp.command,
     args: mcp.args,
-    disabled: false,
+    disabled: true,
   };
 
   if (mcp.env && Object.keys(mcp.env).length > 0) {
@@ -232,7 +232,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToP
       : "⚪ [NÃO INSTALADO]";
 
     console.log(`### 📦 ${item.name} (\`${item.id}\`) ${statusBadge}`);
-    console.log(`⭐ **Estrelas:** ${item.stars} | **Repo:** \`${item.repo}\``);
+    console.log(`📚 **Repo:** \`${item.repo}\` | **Procedência:** ${item.procedencia_verificada === true ? "metadados confirmados (não é auditoria de segurança)" : "não verificada"}`);
     console.log(`📝 **Descrição:** ${item.description}`);
     console.log(`🛠️ **Ferramentas:** ${item.tools.map((t) => `\`${t}\``).join(", ")}`);
     if (item.matchReasons.length > 0) {

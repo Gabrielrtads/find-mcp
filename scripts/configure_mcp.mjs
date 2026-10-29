@@ -51,7 +51,7 @@ export function addServerToConfig(serverId, options = {}) {
   const serverBlock = {
     command: item.command,
     args: item.args,
-    disabled: false,
+    disabled: options.confirmar !== true,
   };
 
   if (item.env && Object.keys(item.env).length > 0) {
@@ -72,7 +72,7 @@ export function addServerToConfig(serverId, options = {}) {
       dryRun: true,
       serverId: item.id,
       serverBlock,
-      message: `[DRY-RUN] Server '${item.id}' would be safely added.`,
+      message: `[DRY-RUN] Server '${item.id}' would be added (${serverBlock.disabled ? "disabled; activation requires --confirmar" : "activation explicitly confirmed"}).`,
     };
   }
 
@@ -84,7 +84,7 @@ export function addServerToConfig(serverId, options = {}) {
     dryRun: false,
     serverId: item.id,
     backupPath,
-    message: `[SUCCESS] Server '${item.id}' added to mcp_config.json. Backup created at: ${backupPath}`,
+    message: `[SUCCESS] Server '${item.id}' added to mcp_config.json (${serverBlock.disabled ? "disabled; activation requires --confirmar" : "activation explicitly confirmed"}). Backup created at: ${backupPath}`,
   };
 }
 
@@ -103,7 +103,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToP
   if (addIndex >= 0 && args[addIndex + 1]) {
     const serverId = args[addIndex + 1];
     try {
-      const result = addServerToConfig(serverId, { dryRun: isDryRun });
+      const result = addServerToConfig(serverId, { dryRun: isDryRun, confirmar: args.includes("--confirmar") });
       console.log(result.message);
       if (result.serverBlock) {
         console.log(JSON.stringify(result.serverBlock, null, 2));
@@ -113,6 +113,6 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToP
       process.exit(1);
     }
   } else {
-    console.log("Usage: node configure_mcp.mjs --add <server_id> [--dry-run]");
+    console.log("Usage: node configure_mcp.mjs --add <server_id> [--dry-run] [--confirmar]");
   }
 }

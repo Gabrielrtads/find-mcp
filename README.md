@@ -28,7 +28,7 @@ Today, connecting an MCP server to an AI coding assistant requires:
                                 │    ➔ Recommends Linear or ClickUp with tool breakdown
                                 │
 [User Request / Project Goal] ──┼──> 2. Direct Search ("youtube", "postgres", "docker")
-                                │    ➔ Returns curated top 3 servers with star ratings
+                                │    ➔ Returns curated top 3 servers with provenance status
                                 │
                                 └──> 3. Context Audit (--context)
                                      ➔ Scans package.json & Dockerfile; flags missing MCPs
@@ -65,7 +65,7 @@ npx find-mcp --context
 🔍 --- Recommended MCP Servers (Found: 2) ---
 
 ### 📦 Linear (`linear`) 🟢 [ALREADY INSTALLED]
-⭐ Stars: 3.5k | Repo: linear/mcp-server
+📚 Repo: linear/mcp-server | Provenance: unverified
 📝 Description: Official Linear integration: manage issues, create tickets, move cards on kanban boards.
 🛠️ Tools: list_issues, save_issue, get_issue, list_projects, list_teams
 💡 Why it matches: Intent match: 'kanban'
@@ -75,7 +75,7 @@ npx find-mcp --context
   "linear": {
     "command": "npx",
     "args": ["-y", "mcp-remote", "https://mcp.linear.app/mcp"],
-    "disabled": false
+    "disabled": true
   }
 }
 ```
@@ -84,18 +84,44 @@ npx find-mcp --context
 
 ## 🛡️ Safe Configuration Injection (Fail-Closed)
 
-`find-mcp` never mutates configuration files silently:
-1. Always displays the exact JSON block with required environment keys;
-2. Requires explicit user approval before saving;
+`find-mcp` writes servers **disabled by default**, including copyable search snippets:
+1. Preview the exact JSON block with required environment keys using `--dry-run`;
+2. Activation requires explicit user approval and the `--confirmar` flag;
 3. Automatically creates a timestamped backup (`mcp_config.backup_<timestamp>.json`) before writing.
 
 ```bash
 # Dry run verification
 node scripts/configure_mcp.mjs --add youtube-transcript --dry-run
 
-# Safe automated injection
+# Save disabled (does not authorize execution)
 node scripts/configure_mcp.mjs --add youtube-transcript
+
+# Only after the user explicitly approves running this server
+node scripts/configure_mcp.mjs --add youtube-transcript --confirmar
 ```
+
+The exported `addServerToConfig` API activates only with `{ confirmar: true }`.
+Confirmation allows the MCP client to execute third-party code on its next load.
+Use a client that honors `disabled`; review the package, permissions, environment
+and version before confirming. Catalog inclusion is not a security audit or an
+integrity check. Most commands still resolve unpinned packages; numeric pins do
+not lock transitive dependencies or verify hashes. Existing configurations are
+not migrated automatically.
+
+### Catalog provenance
+
+`procedencia_verificada: true` means registry ownership and repository metadata
+were checked, not that the executable is safe. Missing or false means unverified.
+Unsourced star counts have been removed.
+
+Checks on 2026-10-29:
+
+| Entry | Evidence and limits |
+| --- | --- |
+| Docker | [PyPI metadata](https://pypi.org/pypi/mcp-server-docker/json) identifies owner `ckreiling`, repository `ckreiling/mcp-server-docker`, and version `0.3.0`; command pinned. |
+| Playwright | [Project package.json](https://raw.githubusercontent.com/microsoft/playwright-mcp/main/package.json) declares `@playwright/mcp`, author Microsoft and `microsoft/playwright-mcp`. Pinned to the known [v0.0.83 release](https://github.com/microsoft/playwright-mcp/releases/tag/v0.0.83). npm publisher/metadata could not be checked, so provenance remains unverified. |
+| Figma | [Project package.json](https://raw.githubusercontent.com/GLips/Figma-Context-MCP/main/package.json) declares `figma-developer-mcp` and `GLips/Figma-Context-MCP`. npm publisher/metadata could not be checked; unverified. |
+| ClickUp, Spotify, n8n, Linear | npm registry requests failed (DNS unavailable from the shell; browser access denied/unavailable). Existing repository hints are unverified; no package ownership claim is made. Linear runs `mcp-remote`, whose publisher also remains unverified. |
 
 ---
 
