@@ -51,18 +51,26 @@ npx skills add Gabrielrtads/find-mcp
 
 ## 🛡️ Safe Configuration Injection (Fail-Closed)
 
-`find-mcp` never mutates configuration files silently.
+`find-mcp` saves servers disabled by default; snippets are also disabled.
 1. Generates the exact JSON block formatted for `mcp_config.json`;
-2. Requires explicit user confirmation ("DE ACORDO") before saving;
+2. Requires explicit user approval before activation via `--confirmar` (API: `{ confirmar: true }`);
 3. Automatically creates a timestamped backup (`.backup_<timestamp>.json`) before writing.
 
 ```bash
 # Safe dry-run
 node scripts/configure_mcp.mjs --add youtube-transcript --dry-run
 
-# Injection after approval
+# Save disabled for review
 node scripts/configure_mcp.mjs --add youtube-transcript
+
+# Activate only after explicit user approval to execute third-party code
+node scripts/configure_mcp.mjs --add youtube-transcript --confirmar
 ```
+
+Review package provenance, version and permissions before requesting approval.
+Missing/false `procedencia_verificada` means unverified; catalog inclusion and
+numeric version pins do not prove code safety or integrity. The client must honor
+`disabled`. See README.md for provenance sources and verification limits.
 
 ---
 
